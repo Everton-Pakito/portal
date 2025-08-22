@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de Sistemas</title>
+
+  <!-- CSS Padrão -->
+  <link rel="stylesheet" href="padrao_css_sistema.css" />
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Ícone -->
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+
+  <!-- iOS Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Portal">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch(err => console.error("Erro SW:", err));
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🌐 Portal de Sistemas</h1>
+      <p>Acesse suas ferramentas em um só lugar</p>
+    </header>
+
+    <main class="content">
+      <section class="section info">
+        <h2>Ferramentas Disponíveis</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+          <a href="medir-curva.html" class="btn">📐 Medir Curva</a>
+          <a href="velocidade-curva.html" class="btn">🚗 Velocidade em Curva</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
