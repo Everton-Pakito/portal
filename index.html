@@ -21,22 +21,47 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
   <style>
-    /* Remove container branco */
-    .container {
-      background: none;
-      box-shadow: none;
-      border-radius: 0;
-      max-width: none;
-      margin: 0;
-      padding: 0;
+    /* Cabeçalho igual rodapé */
+    .header {
+      width: 100%;
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    /* Layout dos botões */
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .header p {
+      margin: 5px 0 0;
+      font-size: clamp(0.9rem, 3vw, 1.2rem);
+      opacity: 0.9;
+    }
+
+    /* Conteúdo geral */
+    .content {
+      padding: 30px 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .content h2 {
+      color: white;
+      font-size: clamp(1.2rem, 5vw, 2rem);
+      margin-bottom: 25px;
+    }
+
+    /* Grid responsivo de botões */
     .btn-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
-      margin-top: 30px;
     }
 
     .btn {
@@ -44,7 +69,7 @@
       justify-content: center;
       text-align: center;
       padding: 20px;
-      font-size: 18px;
+      font-size: clamp(1rem, 3vw, 1.2rem);
     }
   </style>
 
@@ -58,18 +83,16 @@
 </head>
 <body>
   <header class="header">
-    <h1>🌐 Portal de Sistemas</h1>
-    <p>Acesse suas ferramentas em um só lugar</p>
+    <h1>🌐 Portal de Projetos</h1>
+    <p>Projetos Pakito em um só Lugar</p>
   </header>
 
   <main class="content">
-    <section class="section info" style="background:transparent; box-shadow:none; border:none;">
-      <h2 style="text-align:center; color:white;">Ferramentas Disponíveis</h2>
-      <div class="btn-grid">
-        <a href="medir-curva.html" class="btn">📐 Medir Curva</a>
-        <a href="velocidade-curva.html" class="btn">🚗 Velocidade em Curva</a>
-      </div>
-    </section>
+    <h2>Ferramentas</h2>
+    <div class="btn-grid">
+      <a href="medir-curva.html" class="btn">📐 Medir Curva</a>
+      <a href="velocidade-curva.html" class="btn">🚗 Velocidade em Curva</a>
+    </div>
   </main>
 </body>
 </html>
