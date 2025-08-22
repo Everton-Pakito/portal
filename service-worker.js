@@ -7,7 +7,8 @@ const FILES_TO_CACHE = [
   "icons/icon-192-v1.png",
   "icons/icon-512-v1.png",
   "medir-curva.html",
-  "velocidade-curva.html"
+  "velocidade-curva.html",
+  "tracker-pakito.html"
 ];
 
 self.addEventListener("install", (event) => {

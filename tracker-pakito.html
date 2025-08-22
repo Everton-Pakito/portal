@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GPS Tracker">
+    <meta name="application-name" content="GPS Tracker">
+    <title>GPS Tracker - Localização Precisa</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            position: fixed;
+            width: 100%;
+            touch-action: manipulation;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .gps-icon {
+            width: 24px;
+            height: 24px;
+            background: #2563eb;
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .gps-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+
+        .status {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: #0f172a;
+            overflow: hidden;
+            margin-bottom: 140px;
+        }
+
+        .map-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #0f172a;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .leaflet-container {
+            background: #0f172a !important;
+        }
+
+        .leaflet-tile {
+            filter: brightness(0.8) contrast(1.2) saturate(1.1);
+        }
+
+        .leaflet-control-layers {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            border-radius: 12px !important;
+            color: white !important;
+        }
+
+        .leaflet-control-layers-toggle {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-radius: 8px !important;
+        }
+
+        .leaflet-control-layers label {
+            color: white !important;
+        }
+
+        .leaflet-control-zoom {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            border-radius: 12px !important;
+        }
+
+        .leaflet-control-zoom a {
+            background: rgba(30, 41, 59, 0.8) !important;
+            color: white !important;
+            border: none !important;
+            font-weight: bold;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: rgba(59, 130, 246, 0.8) !important;
+        }
+
+        .compass {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .compass::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 25px solid #ef4444;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .compass::after {
+            content: 'N';
+            position: absolute;
+            top: 5px;
+            color: #ef4444;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .info-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            z-index: 1000;
+            padding: 20px;
+            display: block;
+        }
+
+        .coordinates-compact {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .coord-compact {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .coord-label-compact {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .coord-value-compact {
+            font-size: 13px;
+            font-weight: bold;
+            color: #3b82f6;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .share-buttons-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .share-button-fixed {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            padding: 16px 20px;
+            border-radius: 16px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .share-summary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .share-button-fixed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .share-summary:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+        }
+
+        .share-button-fixed:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            color: #94a3b8;
+            z-index: 100;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(148, 163, 184, 0.2);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #ef4444;
+            text-align: center;
+            padding: 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            margin: 20px;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .coordinates-compact {
+                gap: 20px;
+            }
+            
+            .coord-compact {
+                min-width: 80px;
+            }
+            
+            .coord-value-compact {
+                font-size: 11px;
+            }
+            
+            .coord-label-compact {
+                font-size: 10px;
+            }
+            
+            .share-button-fixed {
+                padding: 12px 16px;
+                font-size: 12px;
+            }
+            
+            .header {
+                padding: 8px 15px;
+            }
+            
+            .compass {
+                width: 60px;
+                height: 60px;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .info-panel {
+                padding: 15px;
+            }
+            
+            .map-container {
+                margin-bottom: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="header">
+            <div class="logo">
+                <div class="gps-icon"></div>
+                <span>Pakito Tracker</span>
+            </div>
+            <div class="status" id="status">Aguardando GPS...</div>
+        </div>
+
+        <div class="map-container">
+            <div class="map-canvas" id="mapCanvas">
+                <div id="map"></div>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Obtendo localização GPS...</p>
+                    <small>Certifique-se de permitir acesso à localização</small>
+                </div>
+                <div class="compass" id="compass">
+                    <span id="heading">0°</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <div class="coordinates-compact">
+                <div class="coord-compact">
+                    <div class="coord-label-compact">Latitude</div>
+                    <div class="coord-value-compact" id="latitude">--</div>
+                </div>
+                <div class="coord-compact">
+                    <div class="coord-label-compact">Longitude</div>
+                    <div class="coord-value-compact" id="longitude">--</div>
+                </div>
+                <div class="coord-compact">
+                    <div class="coord-label-compact">Precisão</div>
+                    <div class="coord-value-compact" id="accuracy">-- m</div>
+                </div>
+            </div>
+
+            <div class="share-buttons-container">
+                <button class="share-button-fixed share-complete" onclick="shareLocation('complete')">
+                    📍 Dados Completos
+                </button>
+                <button class="share-button-fixed share-summary" onclick="shareLocation('summary')">
+                    📋 Dados Resumidos
+                </button>
+            </div>
+        </div>
+
+        <div class="error" id="error" style="display: none;"></div>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        Localização copiada e capturada!
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <!-- html2canvas para captura de tela -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        let currentPosition = null;
+        let watchId = null;
+        let currentHeading = 0;
+        let map = null;
+        let marker = null;
+        let accuracyCircle = null;
+        
+        // Variáveis para controle de zoom manual
+        let userChangedZoom = false;
+        let isFirstLocation = true;
+        let lastAutoZoomTime = 0;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMap();
+            startLocationTracking();
+            startCompass();
+        });
+
+        function initializeMap() {
+            // Inicializar mapa centrado no Brasil
+            map = L.map('map', {
+                center: [-15.7942, -47.8822], // Brasília
+                zoom: 6,
+                zoomControl: true,
+                attributionControl: false,
+                preferCanvas: true,
+                maxZoom: 20,
+                minZoom: 3
+            });
+
+            // Detectar quando o usuário interage com o zoom
+            map.on('zoomstart', function(e) {
+                if (Date.now() - lastAutoZoomTime > 1000) {
+                    userChangedZoom = true;
+                    console.log('Zoom manual detectado - bloqueando zoom automático');
+                }
+            });
+
+            map.on('zoomend', function(e) {
+                console.log('Zoom atual:', map.getZoom(), 'Manual:', userChangedZoom);
+            });
+
+            // Detectar movimento manual do mapa
+            map.on('movestart', function(e) {
+                if (Date.now() - lastAutoZoomTime > 1000) {
+                    userChangedZoom = true;
+                    console.log('Movimento manual detectado - bloqueando centralização automática');
+                }
+            });
+
+            // Mapas com provedores funcionais
+            const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+                crossOrigin: true
+            });
+
+            // Mapa satélite usando Google
+            const satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                attribution: '© Google',
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+            });
+
+            // Mapa híbrido (satélite + labels)
+            const hybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                attribution: '© Google',
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+            });
+
+            // Mapa de terreno
+            const terrain = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenTopoMap',
+                maxZoom: 17,
+                crossOrigin: true
+            });
+
+            // Adicionar mapa padrão (OSM)
+            osm.addTo(map);
+
+            // Controle de camadas
+            const baseLayers = {
+                "🗺️ Padrão": osm,
+                "🛰️ Satélite": satellite,
+                "🌍 Híbrido": hybrid,
+                "🏔️ Terreno": terrain
+            };
+
+            L.control.layers(baseLayers, null, {
+                position: 'topleft',
+                collapsed: false
+            }).addTo(map);
+
+            // Controles personalizados
+            const customControl = L.Control.extend({
+                onAdd: function(map) {
+                    const container = L.DomUtil.create('div', 'custom-control');
+                    container.style.cssText = `
+                        background: rgba(15, 23, 42, 0.9);
+                        padding: 8px;
+                        border-radius: 8px;
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(148, 163, 184, 0.2);
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    `;
+                    
+                    // Botão para centralizar na localização
+                    const centerBtn = L.DomUtil.create('button', '', container);
+                    centerBtn.innerHTML = '🎯';
+                    centerBtn.style.cssText = `
+                        background: #3b82f6;
+                        border: none;
+                        color: white;
+                        padding: 8px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                    `;
+                    centerBtn.title = 'Centralizar na minha localização';
+                    centerBtn.onclick = function() {
+                        if (currentPosition) {
+                            lastAutoZoomTime = Date.now();
+                            map.setView([currentPosition.coords.latitude, currentPosition.coords.longitude], map.getZoom());
+                            setTimeout(() => {
+                                userChangedZoom = false;
+                            }, 500);
+                        }
+                    };
+
+                    // Botão para zoom na localização
+                    const zoomBtn = L.DomUtil.create('button', '', container);
+                    zoomBtn.innerHTML = '🔍';
+                    zoomBtn.style.cssText = `
+                        background: #10b981;
+                        border: none;
+                        color: white;
+                        padding: 8px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        margin-top: 5px;
+                    `;
+                    zoomBtn.title = 'Zoom máximo na localização';
+                    zoomBtn.onclick = function() {
+                        if (currentPosition) {
+                            lastAutoZoomTime = Date.now();
+                            map.setView([currentPosition.coords.latitude, currentPosition.coords.longitude], 20);
+                            setTimeout(() => {
+                                userChangedZoom = false;
+                            }, 500);
+                        }
+                    };
+
+                    // Botão para reativar zoom automático
+                    const autoZoomBtn = L.DomUtil.create('button', '', container);
+                    autoZoomBtn.innerHTML = '🔄';
+                    autoZoomBtn.style.cssText = `
+                        background: #8b5cf6;
+                        border: none;
+                        color: white;
+                        padding: 8px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        margin-top: 5px;
+                    `;
+                    autoZoomBtn.title = 'Reativar zoom automático';
+                    autoZoomBtn.onclick = function() {
+                        userChangedZoom = false;
+                        isFirstLocation = true;
+                        console.log('Zoom automático reativado');
+                        
+                        autoZoomBtn.style.background = '#10b981';
+                        setTimeout(() => {
+                            autoZoomBtn.style.background = '#8b5cf6';
+                        }, 1000);
+                        
+                        if (currentPosition) {
+                            const accuracy = currentPosition.coords.accuracy || 10;
+                            const optimalZoom = Math.max(18, Math.min(20, 22 - Math.log2(accuracy)));
+                            lastAutoZoomTime = Date.now();
+                            map.setView([currentPosition.coords.latitude, currentPosition.coords.longitude], optimalZoom);
+                        }
+                    };
+
+                    return container;
+                }
+            });
+
+            new customControl({ position: 'topright' }).addTo(map);
+        }
+
+        function startLocationTracking() {
+            if (!navigator.geolocation) {
+                showError('Geolocalização não suportada neste dispositivo');
+                return;
+            }
+
+            const highAccuracyOptions = {
+                enableHighAccuracy: true,
+                timeout: 30000,
+                maximumAge: 0
+            };
+
+            const watchOptions = {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 1000
+            };
+
+            let attempts = 0;
+            const maxAttempts = 3;
+
+            function tryGetPosition() {
+                attempts++;
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        updatePosition(position);
+                        startContinuousTracking();
+                    },
+                    (error) => {
+                        console.log(`Tentativa ${attempts} falhou:`, error.message);
+                        if (attempts < maxAttempts) {
+                            setTimeout(tryGetPosition, 2000);
+                        } else {
+                            handleError(error);
+                            startContinuousTracking();
+                        }
+                    },
+                    highAccuracyOptions
+                );
+            }
+
+            function startContinuousTracking() {
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+
+                watchId = navigator.geolocation.watchPosition(
+                    updatePosition,
+                    handleError,
+                    watchOptions
+                );
+
+                setInterval(() => {
+                    navigator.geolocation.getCurrentPosition(
+                        updatePosition,
+                        (error) => console.log('Atualização periódica falhou:', error.message),
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                }, 5000);
+            }
+
+            tryGetPosition();
+        }
+
+        function updatePosition(position) {
+            currentPosition = position;
+            
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            console.log(`GPS Update - Precisão: ${accuracy?.toFixed(1)}m, Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`);
+
+            if (accuracy && accuracy > 200) {
+                console.log('Precisão muito baixa, aguardando melhor sinal...');
+                document.getElementById('status').textContent = 'Aguardando melhor sinal GPS...';
+                document.getElementById('status').style.color = '#f59e0b';
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'none';
+
+            if (map) {
+                // Remover marcadores anteriores
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                if (accuracyCircle) {
+                    map.removeLayer(accuracyCircle);
+                }
+
+                // Criar ícone personalizado com cor baseada na precisão
+                let markerColor = '#ef4444';
+                if (accuracy <= 5) markerColor = '#10b981';
+                else if (accuracy <= 15) markerColor = '#f59e0b';
+
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `
+                        <div style="
+                            width: 20px;
+                            height: 20px;
+                            background: ${markerColor};
+                            border: 3px solid white;
+                            border-radius: 50%;
+                            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5);
+                            position: relative;
+                        ">
+                            <div style="
+                                position: absolute;
+                                top: -8px;
+                                left: 50%;
+                                width: 0;
+                                height: 0;
+                                border-left: 5px solid transparent;
+                                border-right: 5px solid transparent;
+                                border-bottom: 8px solid ${markerColor};
+                                transform: translateX(-50%);
+                            "></div>
+                        </div>
+                    `,
+                    iconSize: [26, 30],
+                    iconAnchor: [13, 30]
+                });
+
+                // Adicionar marcador da posição
+                marker = L.marker([lat, lon], { 
+                    icon: customIcon,
+                    title: `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}, Precisão: ${accuracy?.toFixed(1)}m`
+                }).addTo(map);
+
+                // Adicionar círculo de precisão
+                if (accuracy) {
+                    let circleColor = '#ef4444';
+                    if (accuracy <= 5) circleColor = '#10b981';
+                    else if (accuracy <= 15) circleColor = '#f59e0b';
+
+                    accuracyCircle = L.circle([lat, lon], {
+                        radius: accuracy,
+                        color: circleColor,
+                        fillColor: circleColor,
+                        fillOpacity: 0.1,
+                        weight: 2,
+                        dashArray: accuracy > 15 ? '5, 5' : null
+                    }).addTo(map);
+                }
+
+                // Controle de zoom inteligente
+                if (!userChangedZoom) {
+                    let shouldZoom = false;
+                    let targetZoom = map.getZoom();
+
+                    if (isFirstLocation) {
+                        shouldZoom = true;
+                        targetZoom = Math.max(18, Math.min(20, 22 - Math.log2(accuracy || 1)));
+                        isFirstLocation = false;
+                        console.log('Primeira localização - aplicando zoom automático:', targetZoom);
+                    } else if (accuracy && accuracy <= 10 && map.getZoom() < 18) {
+                        shouldZoom = true;
+                        targetZoom = 19;
+                        console.log('Precisão melhorou - aplicando zoom automático:', targetZoom);
+                    }
+
+                    if (shouldZoom) {
+                        lastAutoZoomTime = Date.now();
+                        map.setView([lat, lon], targetZoom);
+                    } else if (map.getZoom() < 15) {
+                        lastAutoZoomTime = Date.now();
+                        map.setView([lat, lon], Math.max(map.getZoom(), 15));
+                        console.log('Centralizando sem zoom extremo');
+                    }
+                } else {
+                    console.log('Zoom manual ativo - mantendo configuração do usuário');
+                }
+
+                // Popup com informações detalhadas
+                const qualityText = accuracy <= 5 ? 'Excelente' : 
+                                 accuracy <= 15 ? 'Boa' : 
+                                 accuracy <= 50 ? 'Moderada' : 'Baixa';
+                
+                const popupContent = `
+                    <div style="color: #1e293b; font-family: Arial, sans-serif;">
+                        <h4 style="margin: 0 0 10px 0; color: #3b82f6;">📍 Sua Localização</h4>
+                        <p style="margin: 5px 0;"><strong>Latitude:</strong> ${lat.toFixed(6)}°</p>
+                        <p style="margin: 5px 0;"><strong>Longitude:</strong> ${lon.toFixed(6)}°</p>
+                        <p style="margin: 5px 0;"><strong>Precisão:</strong> ${accuracy ? accuracy.toFixed(1) + 'm' : 'N/A'}</p>
+                        <p style="margin: 5px 0;"><strong>Qualidade:</strong> ${qualityText}</p>
+                        <p style="margin: 5px 0;"><strong>Horário:</strong> ${new Date().toLocaleTimeString('pt-BR')}</p>
+                        ${position.coords.altitude ? `<p style="margin: 5px 0;"><strong>Altitude:</strong> ${position.coords.altitude.toFixed(1)}m</p>` : ''}
+                        ${position.coords.speed ? `<p style="margin: 5px 0;"><strong>Velocidade:</strong> ${(position.coords.speed * 3.6).toFixed(1)} km/h</p>` : ''}
+                        <p style="margin: 5px 0; font-size: 11px; color: #666;"><strong>Zoom:</strong> ${userChangedZoom ? 'Manual' : 'Automático'}</p>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+            }
+            
+            // Atualizar coordenadas na interface
+            document.getElementById('latitude').textContent = lat.toFixed(6);
+            document.getElementById('longitude').textContent = lon.toFixed(6);
+            document.getElementById('accuracy').textContent = 
+                accuracy ? `${accuracy.toFixed(1)} m` : '-- m';
+            
+            // Atualizar status com informações mais detalhadas
+            let statusText = 'GPS Ativo';
+            let statusColor = '#10b981';
+            
+            if (accuracy <= 5) {
+                statusText = 'GPS - Precisão Excelente';
+                statusColor = '#10b981';
+            } else if (accuracy <= 15) {
+                statusText = 'GPS - Precisão Boa';
+                statusColor = '#10b981';
+            } else if (accuracy <= 50) {
+                statusText = 'GPS - Precisão Moderada';
+                statusColor = '#f59e0b';
+            } else if (accuracy > 50) {
+                statusText = 'GPS - Precisão Baixa';
+                statusColor = '#ef4444';
+            }
+
+            if (userChangedZoom) {
+                statusText += ' (Zoom Manual)';
+            }
+            
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = statusText;
+            statusEl.style.color = statusColor;
+
+            // Vibração baseada na qualidade do sinal
+            if ('vibrate' in navigator) {
+                if (accuracy <= 5) {
+                    navigator.vibrate([100]);
+                } else if (accuracy <= 15) {
+                    navigator.vibrate([50]);
+                } else {
+                    navigator.vibrate([25]);
+                }
+            }
+        }
+
+        function handleError(error) {
+            let message = 'Erro ao obter localização: ';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message += 'Permissão negada. Ative a localização nas configurações.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message += 'Posição indisponível. Verifique se o GPS está ativo.';
+                    break;
+                case error.TIMEOUT:
+                    message += 'Tempo esgotado. Tentando novamente...';
+                    setTimeout(startLocationTracking, 3000);
+                    return;
+                default:
+                    message += 'Erro desconhecido.';
+                    break;
+            }
+            
+            showError(message);
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        function startCompass() {
+            if ('DeviceOrientationEvent' in window) {
+                window.addEventListener('deviceorientationabsolute', handleOrientation);
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        function handleOrientation(event) {
+            let heading = event.alpha;
+            if (heading !== null) {
+                heading = 360 - heading;
+                currentHeading = heading;
+                
+                const compass = document.getElementById('compass');
+                const headingEl = document.getElementById('heading');
+                
+                compass.style.transform = `rotate(${heading}deg)`;
+                headingEl.textContent = `${Math.round(heading)}°`;
+            }
+        }
+
+        async function shareLocation(type = 'complete') {
+            if (!currentPosition) {
+                alert('Aguarde a obtenção da localização GPS');
+                return;
+            }
+
+            const lat = currentPosition.coords.latitude;
+            const lon = currentPosition.coords.longitude;
+            const accuracy = currentPosition.coords.accuracy;
+            
+            let message;
+            
+            if (type === 'summary') {
+                message = `🌍 DADOS DA LOCALIZAÇÃO
+				
+🗺️ Link do Mapa:
+Google Maps: https://maps.google.com/?q=${lat},${lon}
+
+📊 Referências Técnicas:
+Lat/Long: ${lat.toFixed(6)}, ${lon.toFixed(6)}
+DMS: ${convertToDMS(lat, lon)}
+
+⚡ Gerado por GPS Tracker Pakito`;
+            } else {
+                const timestamp = new Date().toLocaleString('pt-BR');
+                message = `🌍 DADOS DA LOCALIZAÇÃO
+            
+📍 Coordenadas:
+Latitude: ${lat.toFixed(6)}°
+Longitude: ${lon.toFixed(6)}°
+
+🎯 Precisão: ${accuracy ? accuracy.toFixed(1) + 'm' : 'N/A'}
+📅 Data/Hora: ${timestamp}
+🧭 Direção: ${Math.round(currentHeading)}°
+
+🗺️ Links de Mapas:
+Google Maps: https://maps.google.com/?q=${lat},${lon}
+Apple Maps: https://maps.apple.com/?ll=${lat},${lon}
+Waze: https://waze.com/ul?ll=${lat},${lon}
+
+📊 Referências Técnicas:
+Lat/Long: ${lat.toFixed(6)}, ${lon.toFixed(6)}
+DMS: ${convertToDMS(lat, lon)}
+
+⚡ Gerado por GPS Tracker Pakito`;
+            }
+
+            try {
+                // Capturar screenshot para ambos os tipos, mas com nomes diferentes
+                if (type === 'complete') {
+                    await captureScreenshot('complete');
+                } else if (type === 'summary') {
+                    await captureScreenshot('summary');
+                }
+                
+                // Copiar para área de transferência
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(message);
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = message;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+
+                // Tentar compartilhar nativamente
+                if (navigator.share) {
+                    await navigator.share({
+                        title: type === 'summary' ? 'Minha Localização GPS (Resumida)' : 'Minha Localização GPS',
+                        text: message
+                    });
+                }
+
+                showSuccess();
+                
+            } catch (error) {
+                console.error('Erro ao compartilhar:', error);
+                showLocationModal(message);
+            }
+        }
+
+        function convertToDMS(lat, lon) {
+            const latDMS = convertCoordToDMS(lat, lat >= 0 ? 'N' : 'S');
+            const lonDMS = convertCoordToDMS(lon, lon >= 0 ? 'E' : 'W');
+            return `${latDMS} ${lonDMS}`;
+        }
+
+        function convertCoordToDMS(coord, direction) {
+            const absolute = Math.abs(coord);
+            const degrees = Math.floor(absolute);
+            const minutesFloat = (absolute - degrees) * 60;
+            const minutes = Math.floor(minutesFloat);
+            const seconds = ((minutesFloat - minutes) * 60).toFixed(2);
+            return `${degrees}°${minutes}'${seconds}"${direction}`;
+        }
+
+        async function captureScreenshot() {
+            try {
+                // Usar a Screen Capture API se disponível
+                if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                    try {
+                        const stream = await navigator.mediaDevices.getDisplayMedia({
+                            video: { mediaSource: 'screen' }
+                        });
+                        
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.play();
+                        
+                        video.addEventListener('loadedmetadata', () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(video, 0, 0);
+                            
+                            // Parar o stream
+                            stream.getTracks().forEach(track => track.stop());
+                            
+                            const dataUrl = canvas.toDataURL('image/png', 0.9);
+                            
+                            const now = new Date();
+                            const dateStr = now.toISOString().split('T')[0];
+                            const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
+                            const lat = currentPosition.coords.latitude.toFixed(4);
+                            const lon = currentPosition.coords.longitude.toFixed(4);
+                            
+                            const filename = `GPS_Screen_${dateStr}_${timeStr}_${lat}_${lon}.png`;
+                            downloadImage(dataUrl, filename);
+                        });
+                        
+                        return;
+                    } catch (screenError) {
+                        console.log('Screen capture não disponível, usando método alternativo');
+                    }
+                }
+                
+                // Método alternativo: usar html2canvas se disponível
+                if (window.html2canvas) {
+                    const element = document.getElementById('app');
+                    const canvas = await html2canvas(element, {
+                        allowTaint: true,
+                        useCORS: true,
+                        scale: 0.8,
+                        backgroundColor: '#1e293b'
+                    });
+                    
+                    const dataUrl = canvas.toDataURL('image/png', 0.9);
+                    
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
+                    const lat = currentPosition.coords.latitude.toFixed(4);
+                    const lon = currentPosition.coords.longitude.toFixed(4);
+                    
+                    const filename = `GPS_App_${dateStr}_${timeStr}_${lat}_${lon}.png`;
+                    downloadImage(dataUrl, filename);
+                    
+                    return;
+                }
+                
+                // Fallback: criar uma imagem informativa com os dados GPS
+                if (map && currentPosition) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = 400;
+                    canvas.height = 600;
+                    
+                    // Fundo gradiente
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#1e293b');
+                    gradient.addColorStop(1, '#334155');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Cabeçalho
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+                    ctx.fillRect(0, 0, canvas.width, 80);
+                    
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.font = 'bold 24px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('📍 GPS Tracker Pakito', canvas.width/2, 35);
+                    
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '14px Arial';
+                    ctx.fillText(new Date().toLocaleString('pt-BR'), canvas.width/2, 60);
+                    
+                    // Seção de coordenadas
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                    ctx.fillRect(20, 100, canvas.width-40, 200);
+                    
+                    ctx.fillStyle = '#10b981';
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('📊 COORDENADAS GPS', 40, 130);
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = '16px Arial';
+                    ctx.fillText(`Latitude: ${currentPosition.coords.latitude.toFixed(6)}°`, 40, 160);
+                    ctx.fillText(`Longitude: ${currentPosition.coords.longitude.toFixed(6)}°`, 40, 185);
+                    ctx.fillText(`Precisão: ${currentPosition.coords.accuracy?.toFixed(1) || 'N/A'}m`, 40, 210);
+                    ctx.fillText(`Direção: ${Math.round(currentHeading)}°`, 40, 235);
+                    
+                    if (currentPosition.coords.altitude) {
+                        ctx.fillText(`Altitude: ${currentPosition.coords.altitude.toFixed(1)}m`, 40, 260);
+                    }
+                    
+                    if (currentPosition.coords.speed) {
+                        ctx.fillText(`Velocidade: ${(currentPosition.coords.speed * 3.6).toFixed(1)} km/h`, 40, 285);
+                    }
+                    
+                    // Seção DMS
+                    ctx.fillStyle = 'rgba(139, 92, 246, 0.2)';
+                    ctx.fillRect(20, 320, canvas.width-40, 100);
+                    
+                    ctx.fillStyle = '#8b5cf6';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText('🌍 FORMATO DMS', 40, 350);
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = '14px Arial';
+                    const dms = convertToDMS(currentPosition.coords.latitude, currentPosition.coords.longitude);
+                    ctx.fillText(dms, 40, 375);
+                    
+                    // Links
+                    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+                    ctx.fillRect(20, 440, canvas.width-40, 120);
+                    
+                    ctx.fillStyle = '#10b981';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText('🔗 LINKS DE MAPAS', 40, 470);
+                    
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.font = '12px Arial';
+                    ctx.fillText('Google Maps:', 40, 495);
+                    ctx.fillText(`maps.google.com/?q=${currentPosition.coords.latitude.toFixed(6)},${currentPosition.coords.longitude.toFixed(6)}`, 40, 510);
+                    
+                    ctx.fillText('Apple Maps:', 40, 530);
+                    ctx.fillText(`maps.apple.com/?ll=${currentPosition.coords.latitude.toFixed(6)},${currentPosition.coords.longitude.toFixed(6)}`, 40, 545);
+                    
+                    // Rodapé
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('⚡ Captura gerada pelo GPS Tracker Pakito', canvas.width/2, canvas.height - 20);
+                    
+                    const dataUrl = canvas.toDataURL('image/png', 0.9);
+                    
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
+                    const lat = currentPosition.coords.latitude.toFixed(4);
+                    const lon = currentPosition.coords.longitude.toFixed(4);
+                    
+                    const filename = `GPS_Data_${dateStr}_${timeStr}_${lat}_${lon}.png`;
+                    downloadImage(dataUrl, filename);
+                }
+            } catch (error) {
+                console.error('Erro ao capturar screenshot:', error);
+                
+                // Criar pelo menos uma imagem com os dados básicos
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 300;
+                canvas.height = 200;
+                
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('📍 GPS Tracker', canvas.width/2, 30);
+                ctx.fillText('Erro na captura de tela', canvas.width/2, 60);
+                
+                if (currentPosition) {
+                    ctx.font = '12px Arial';
+                    ctx.fillText(`${currentPosition.coords.latitude.toFixed(6)}, ${currentPosition.coords.longitude.toFixed(6)}`, canvas.width/2, 100);
+                    ctx.fillText(`Precisão: ${currentPosition.coords.accuracy?.toFixed(1)}m`, canvas.width/2, 120);
+                    ctx.fillText(new Date().toLocaleString('pt-BR'), canvas.width/2, 150);
+                }
+                
+                const dataUrl = canvas.toDataURL('image/png');
+                downloadImage(dataUrl, `GPS_Error_${Date.now()}.png`);
+            }
+        }
+
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showSuccess() {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        function showLocationModal(message) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                padding: 20px;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: #1e293b;
+                padding: 30px;
+                border-radius: 16px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                border: 1px solid rgba(148, 163, 184, 0.2);
+            `;
+            
+            content.innerHTML = `
+                <h3 style="color: white; margin-bottom: 20px; text-align: center;">📍 Localização GPS</h3>
+                <textarea readonly style="
+                    width: 100%;
+                    height: 300px;
+                    background: #0f172a;
+                    color: white;
+                    border: 1px solid rgba(148, 163, 184, 0.3);
+                    border-radius: 8px;
+                    padding: 15px;
+                    font-family: monospace;
+                    font-size: 12px;
+                    resize: none;
+                    margin-bottom: 20px;
+                ">${message}</textarea>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="copyToClipboard('${message.replace(/'/g, "\\'")}'); this.textContent='Copiado!'" style="
+                        background: #3b82f6;
+                        color: white;
+                        border: none;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">Copiar Texto</button>
+                    <button onclick="document.body.removeChild(this.closest('.modal-overlay'))" style="
+                        background: #6b7280;
+                        color: white;
+                        border: none;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">Fechar</button>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+            showSuccess();
+        }
+
+        // Cleanup ao fechar
+        window.addEventListener('beforeunload', function() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+        });
+
+        // Manter tela ligada
+        let wakeLock = null;
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Tela mantida ligada');
+                }
+            } catch (err) {
+                console.log('Wake lock não suportado:', err);
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        requestWakeLock();
+    </script>
+</body>
+</html>
