@@ -7,9 +7,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="GPS Tracker Offline">
-    <meta name="application-name" content="GPS Tracker Offline">
-    <title>GPS Tracker Pakito - São Paulo Offline</title>
+    <meta name="apple-mobile-web-app-title" content="GPS Tracker Valparaíso">
+    <meta name="application-name" content="GPS Tracker Valparaíso">
+    <title>GPS Tracker Pakito - Valparaíso SP Offline</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
@@ -42,7 +42,7 @@
         .header {
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
-            padding: 8px 20px;
+            padding: 8px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -55,12 +55,12 @@
             align-items: center;
             gap: 8px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .gps-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: #2563eb;
             border-radius: 50%;
             position: relative;
@@ -81,7 +81,7 @@
 
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
-            70% { box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
             100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
         }
 
@@ -89,7 +89,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            font-size: 11px;
+            font-size: 10px;
         }
 
         .status {
@@ -99,6 +99,11 @@
         .offline-status {
             color: #10b981;
             font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .offline-ready {
+            color: #8b5cf6 !important;
         }
 
         .map-container {
@@ -106,7 +111,7 @@
             position: relative;
             background: #0f172a;
             overflow: hidden;
-            margin-bottom: 160px;
+            margin-bottom: 150px;
         }
 
         .map-canvas {
@@ -127,52 +132,52 @@
             background: #0f172a !important;
         }
 
-        .leaflet-tile {
-            filter: brightness(0.8) contrast(1.2) saturate(1.1);
-        }
-
         .download-panel {
             position: fixed;
-            top: 60px;
-            left: 10px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
+            top: 50px;
+            left: 8px;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(148, 163, 184, 0.3);
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             z-index: 1000;
-            min-width: 280px;
-            max-width: 320px;
+            min-width: 260px;
+            max-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
         .download-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 12px;
             color: #3b82f6;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .download-info {
-            font-size: 11px;
+        .coverage-info {
+            font-size: 10px;
             color: #94a3b8;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             line-height: 1.4;
+            padding: 8px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
         }
 
         .download-controls {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .zoom-control {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 12px;
+            gap: 8px;
+            font-size: 11px;
         }
 
         .zoom-slider {
@@ -186,8 +191,8 @@
 
         .zoom-slider::-webkit-slider-thumb {
             appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background: #3b82f6;
             border-radius: 50%;
             cursor: pointer;
@@ -196,10 +201,10 @@
         .download-button {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 8px;
             color: white;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -217,66 +222,87 @@
             cursor: not-allowed;
         }
 
+        .download-button.complete {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .download-button.complete:hover:not(:disabled) {
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .clear-button {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        }
+
+        .clear-button:hover:not(:disabled) {
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
+        }
+
+        .progress-container {
+            margin: 8px 0;
+        }
+
         .progress-bar {
             width: 100%;
             height: 6px;
             background: #334155;
             border-radius: 3px;
             overflow: hidden;
-            margin: 10px 0;
+            margin-bottom: 5px;
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #10b981, #059669);
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.2s ease;
         }
 
         .progress-text {
-            font-size: 10px;
+            font-size: 9px;
             color: #94a3b8;
             text-align: center;
-            margin-top: 5px;
         }
 
         .storage-info {
-            font-size: 10px;
+            font-size: 9px;
             color: #64748b;
-            margin-top: 10px;
-            padding: 8px;
+            margin-top: 8px;
+            padding: 6px;
             background: rgba(30, 41, 59, 0.5);
-            border-radius: 6px;
+            border-radius: 5px;
+            text-align: center;
         }
 
         .compass {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 70px;
-            height: 70px;
+            top: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
             background: rgba(15, 23, 42, 0.9);
             border: 2px solid rgba(148, 163, 184, 0.3);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
+            z-index: 100;
         }
 
         .compass::before {
             content: '';
             position: absolute;
-            top: 8px;
+            top: 6px;
             left: 50%;
             width: 0;
             height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 20px solid #ef4444;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 18px solid #ef4444;
             transform: translateX(-50%);
             z-index: 1;
         }
@@ -284,10 +310,10 @@
         .compass::after {
             content: 'N';
             position: absolute;
-            top: 4px;
+            top: 3px;
             color: #ef4444;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 9px;
             z-index: 2;
         }
 
@@ -300,15 +326,15 @@
             backdrop-filter: blur(15px);
             border-top: 1px solid rgba(148, 163, 184, 0.2);
             z-index: 1000;
-            padding: 15px;
+            padding: 12px;
         }
 
         .coordinates-compact {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
 
@@ -316,20 +342,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 90px;
+            min-width: 80px;
         }
 
         .coord-label-compact {
-            font-size: 10px;
+            font-size: 9px;
             color: #94a3b8;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 500;
         }
 
         .coord-value-compact {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #3b82f6;
             font-family: 'Courier New', monospace;
@@ -339,7 +365,7 @@
 
         .share-buttons-container {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             max-width: 400px;
             margin: 0 auto;
@@ -348,10 +374,10 @@
         .share-button-fixed {
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             border: none;
-            padding: 14px 16px;
-            border-radius: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
             color: white;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -378,14 +404,14 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             color: #94a3b8;
             z-index: 100;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             border: 3px solid rgba(148, 163, 184, 0.2);
             border-top: 3px solid #3b82f6;
             border-radius: 50%;
@@ -399,15 +425,15 @@
 
         .success-message {
             position: fixed;
-            top: 20px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 10px 18px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             z-index: 2000;
             box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
             opacity: 0;
@@ -422,30 +448,43 @@
 
         .toggle-panel {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 8px;
+            left: 8px;
             background: rgba(59, 130, 246, 0.9);
             border: none;
             color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
             z-index: 1001;
             backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-panel:hover {
+            background: rgba(59, 130, 246, 1);
+            transform: translateY(-1px);
         }
 
         .hidden {
             display: none !important;
         }
 
+        .coverage-circle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
         @media (max-width: 768px) {
             .download-panel {
-                position: fixed;
-                top: 60px;
-                left: 5px;
-                right: 5px;
+                top: 45px;
+                left: 4px;
+                right: 4px;
                 max-width: none;
                 min-width: auto;
             }
@@ -455,23 +494,46 @@
             }
             
             .coord-compact {
-                min-width: 70px;
+                min-width: 65px;
             }
             
             .info-panel {
-                padding: 12px;
+                padding: 10px;
             }
             
             .map-container {
-                margin-bottom: 140px;
+                margin-bottom: 130px;
             }
 
             .compass {
-                width: 60px;
-                height: 60px;
-                top: 15px;
-                right: 15px;
+                width: 50px;
+                height: 50px;
+                top: 10px;
+                right: 10px;
             }
+
+            .compass::before {
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-bottom: 15px solid #ef4444;
+            }
+
+            .header {
+                padding: 6px 12px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+        }
+
+        /* Estilos para tiles offline do Google */
+        .offline-tile {
+            filter: brightness(0.9) contrast(1.1);
+        }
+
+        .leaflet-tile-container {
+            transform: none !important;
         }
     </style>
 </head>
@@ -480,7 +542,7 @@
         <div class="header">
             <div class="logo">
                 <div class="gps-icon"></div>
-                <span>Pakito Tracker SP</span>
+                <span>Pakito Valparaíso</span>
             </div>
             <div class="status-info">
                 <div class="status" id="status">Aguardando GPS...</div>
@@ -489,36 +551,50 @@
         </div>
 
         <button class="toggle-panel" onclick="toggleDownloadPanel()">
-            📥 Mapas Offline
+            🗺️ Offline
         </button>
 
-        <div class="download-panel" id="downloadPanel">
+        <div class="download-panel hidden" id="downloadPanel">
             <div class="download-header">
-                🗺️ Download de Mapas - São Paulo
+                🌍 Mapas Google - Valparaíso SP
             </div>
-            <div class="download-info">
-                Baixe os mapas de São Paulo para usar sem internet. Selecione o nível de zoom máximo e inicie o download.
+            
+            <div class="coverage-info">
+                <strong>📍 Área de Cobertura:</strong><br>
+                • Centro: Valparaíso-SP<br>
+                • Raio: 200km (40.000 km²)<br>
+                • Inclui: Grande SP, Interior, Litoral
             </div>
             
             <div class="download-controls">
                 <div class="zoom-control">
                     <span>Zoom:</span>
-                    <input type="range" class="zoom-slider" id="maxZoomSlider" min="6" max="16" value="12">
-                    <span id="zoomValue">12</span>
+                    <input type="range" class="zoom-slider" id="maxZoomSlider" min="8" max="16" value="13">
+                    <span id="zoomValue">13</span>
                 </div>
                 
-                <button class="download-button" id="downloadBtn" onclick="startDownload()">
-                    🚀 Iniciar Download
+                <button class="download-button" id="satelliteBtn" onclick="downloadLayer('satellite')">
+                    🛰️ Baixar Satélite
                 </button>
                 
-                <button class="download-button" id="clearBtn" onclick="clearOfflineData()" style="background: #ef4444;">
+                <button class="download-button" id="hybridBtn" onclick="downloadLayer('hybrid')">
+                    🌍 Baixar Híbrido
+                </button>
+                
+                <button class="download-button complete" id="downloadAllBtn" onclick="downloadAll()">
+                    ⚡ Baixar Todos
+                </button>
+                
+                <button class="download-button clear-button" id="clearBtn" onclick="clearOfflineData()">
                     🗑️ Limpar Cache
                 </button>
                 
-                <div class="progress-bar" id="progressBarContainer" style="display: none;">
-                    <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText"></div>
                 </div>
-                <div class="progress-text" id="progressText"></div>
                 
                 <div class="storage-info" id="storageInfo">
                     Cache: 0 MB | Tiles: 0
@@ -532,7 +608,7 @@
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
                     <p>Obtendo localização GPS...</p>
-                    <small>Certifique-se de permitir acesso à localização</small>
+                    <small>Permitir acesso à localização</small>
                 </div>
                 <div class="compass" id="compass">
                     <span id="heading">0°</span>
@@ -554,21 +630,25 @@
                     <div class="coord-label-compact">Precisão</div>
                     <div class="coord-value-compact" id="accuracy">-- m</div>
                 </div>
+                <div class="coord-compact">
+                    <div class="coord-label-compact">Distância</div>
+                    <div class="coord-value-compact" id="distance">-- km</div>
+                </div>
             </div>
 
             <div class="share-buttons-container">
                 <button class="share-button-fixed share-complete" onclick="shareLocation('complete')">
-                    📍 Dados Completos
+                    📍 Completo
                 </button>
                 <button class="share-button-fixed share-summary" onclick="shareLocation('summary')">
-                    📋 Dados Resumidos
+                    📋 Resumido
                 </button>
             </div>
         </div>
     </div>
 
     <div class="success-message" id="successMessage">
-        Localização copiada e capturada!
+        Localização copiada!
     </div>
 
     <!-- Leaflet JS -->
@@ -581,37 +661,42 @@
         let map = null;
         let marker = null;
         let accuracyCircle = null;
+        let coverageCircle = null;
         
-        // Variáveis para controle offline
+        // Configurações offline
         let offlineDB = null;
         let downloadInProgress = false;
         let currentLayers = {};
+        let totalCachedTiles = 0;
         
-        // Configurações das camadas
+        // Centro: Valparaíso-SP (coordenadas aproximadas da região)
+        const VALPARAISO_CENTER = {
+            lat: -21.2178,  // Valparaíso SP (região noroeste)
+            lng: -50.8731
+        };
+        
+        const COVERAGE_RADIUS_KM = 200; // 200km de raio
+        
+        // Configurações das camadas Google
         const layerConfigs = {
             osm: {
                 name: "OpenStreetMap",
                 url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                maxZoom: 19
+                maxZoom: 19,
+                subdomains: ['a', 'b', 'c']
             },
             satellite: {
-                name: "Satélite",
-                url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-                maxZoom: 20
+                name: "Google Satélite",
+                url: "https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                maxZoom: 20,
+                subdomains: ['0', '1', '2', '3']
             },
             hybrid: {
-                name: "Híbrido",
-                url: "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-                maxZoom: 20
+                name: "Google Híbrido",
+                url: "https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+                maxZoom: 20,
+                subdomains: ['0', '1', '2', '3']
             }
-        };
-
-        // Limites de São Paulo
-        const saoPauloBounds = {
-            north: -19.7,
-            south: -25.4,
-            east: -44.0,
-            west: -53.2
         };
 
         // Inicialização
@@ -622,20 +707,23 @@
             startCompass();
             updateStorageInfo();
             
-            // Atualizar valor do slider
+            // Slider de zoom
             document.getElementById('maxZoomSlider').addEventListener('input', function() {
                 document.getElementById('zoomValue').textContent = this.value;
             });
             
-            // Detectar status online/offline
+            // Status online/offline
             window.addEventListener('online', updateOfflineStatus);
             window.addEventListener('offline', updateOfflineStatus);
             updateOfflineStatus();
+
+            // Verificar se já tem dados offline
+            await checkOfflineDataStatus();
         });
 
         async function initOfflineDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('GPSTrackerOffline', 1);
+                const request = indexedDB.open('ValparaisoGPSOffline', 2);
                 
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
@@ -645,27 +733,35 @@
                 
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
-                    if (!db.objectStoreNames.contains('tiles')) {
-                        const store = db.createObjectStore('tiles', { keyPath: 'key' });
-                        store.createIndex('layer', 'layer', { unique: false });
+                    
+                    // Limpar stores antigos se existirem
+                    if (db.objectStoreNames.contains('tiles')) {
+                        db.deleteObjectStore('tiles');
                     }
+                    
+                    // Criar novo store otimizado
+                    const store = db.createObjectStore('tiles', { keyPath: 'key' });
+                    store.createIndex('layer', 'layer', { unique: false });
+                    store.createIndex('zoom', 'z', { unique: false });
+                    store.createIndex('timestamp', 'timestamp', { unique: false });
                 };
             });
         }
 
-        function initializeMap() {
-            // Centralizar no estado de São Paulo
+        async function initializeMap() {
+            // Centralizar em Valparaíso-SP
             map = L.map('map', {
-                center: [-23.5489, -46.6388], // São Paulo capital
-                zoom: 8,
+                center: [VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng],
+                zoom: 10,
                 zoomControl: true,
                 attributionControl: false,
                 preferCanvas: true,
                 maxZoom: 20,
-                minZoom: 6
+                minZoom: 8,
+                zoomSnap: 0.5
             });
 
-            // Criar camadas com cache offline
+            // Criar camadas com cache offline otimizado
             const offlineOSM = createOfflineLayer('osm');
             const offlineSatellite = createOfflineLayer('satellite');
             const offlineHybrid = createOfflineLayer('hybrid');
@@ -675,7 +771,7 @@
 
             // Controle de camadas
             const baseLayers = {
-                "🗺️ OpenStreetMap": offlineOSM,
+                "🗺️ Padrão": offlineOSM,
                 "🛰️ Satélite": offlineSatellite,
                 "🌍 Híbrido": offlineHybrid
             };
@@ -685,14 +781,16 @@
                 collapsed: false
             }).addTo(map);
 
-            // Armazenar referências das camadas
             currentLayers = {
                 osm: offlineOSM,
                 satellite: offlineSatellite,
                 hybrid: offlineHybrid
             };
 
-            // Adicionar controles personalizados
+            // Adicionar círculo de cobertura
+            addCoverageCircle();
+            
+            // Controles personalizados
             addCustomControls();
         }
 
@@ -703,24 +801,31 @@
                 attribution: `© ${config.name}`,
                 maxZoom: config.maxZoom,
                 crossOrigin: true,
-                // Interceptar requisições para cache offline
-                tileLoadFunction: function(tile, url) {
-                    loadTileOffline(tile, url, layerType);
+                subdomains: config.subdomains || ['a', 'b', 'c'],
+                className: 'offline-tile',
+                // Interceptar carregamento de tiles
+                tileLoadFunction: async function(tile, url) {
+                    await loadTileWithCache(tile, url, layerType);
                 }
             });
         }
 
-        async function loadTileOffline(tile, url, layerType) {
+        async function loadTileWithCache(tile, url, layerType) {
             try {
-                // Extrair coordenadas z/x/y da URL
-                const match = url.match(/\/(\d+)\/(\d+)\/(\d+)/);
-                if (!match) {
+                // Extrair coordenadas da URL
+                const coords = extractTileCoords(url);
+                if (!coords) {
                     tile.src = url;
                     return;
                 }
                 
-                const [, z, x, y] = match;
-                const tileKey = `${layerType}_${z}_${x}_${y}`;
+                const tileKey = `${layerType}_${coords.z}_${coords.x}_${coords.y}`;
+                
+                // Verificar se está dentro da área de cobertura
+                if (!isWithinCoverage(coords)) {
+                    tile.src = createEmptyTile('Fora da área');
+                    return;
+                }
                 
                 // Tentar carregar do cache primeiro
                 const cachedTile = await getCachedTile(tileKey);
@@ -729,37 +834,120 @@
                     return;
                 }
                 
-                // Se não está no cache e estamos offline, usar tile vazio
+                // Se offline e não há cache, mostrar tile vazio
                 if (!navigator.onLine) {
-                    tile.src = createEmptyTile();
+                    tile.src = createEmptyTile('Offline');
                     return;
                 }
                 
-                // Carregar do servidor e cachear
-                const response = await fetch(url);
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const dataUrl = await blobToDataUrl(blob);
-                    
-                    // Salvar no cache
-                    await saveTileToCache(tileKey, {
-                        key: tileKey,
-                        layer: layerType,
-                        z: parseInt(z),
-                        x: parseInt(x),
-                        y: parseInt(y),
-                        blob: dataUrl,
-                        timestamp: Date.now()
-                    });
-                    
-                    tile.src = dataUrl;
-                } else {
-                    tile.src = url; // Fallback
-                }
+                // Carregar do servidor com retry
+                await loadAndCacheTile(tile, url, tileKey, layerType, coords);
+                
             } catch (error) {
                 console.log('Erro ao carregar tile:', error);
                 tile.src = url; // Fallback
             }
+        }
+
+        async function loadAndCacheTile(tile, url, tileKey, layerType, coords) {
+            const maxRetries = 3;
+            let retries = 0;
+            
+            while (retries < maxRetries) {
+                try {
+                    // Substituir subdomain randomicamente para balanceamento
+                    const config = layerConfigs[layerType];
+                    const subdomain = config.subdomains[Math.floor(Math.random() * config.subdomains.length)];
+                    const finalUrl = url.replace('{s}', subdomain);
+                    
+                    const response = await fetch(finalUrl, {
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+                    
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const dataUrl = await blobToDataUrl(blob);
+                        
+                        // Salvar no cache de forma assíncrona
+                        saveTileToCache(tileKey, {
+                            key: tileKey,
+                            layer: layerType,
+                            z: coords.z,
+                            x: coords.x,
+                            y: coords.y,
+                            blob: dataUrl,
+                            size: blob.size,
+                            timestamp: Date.now()
+                        });
+                        
+                        tile.src = dataUrl;
+                        return;
+                    }
+                } catch (error) {
+                    retries++;
+                    if (retries < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+                    }
+                }
+            }
+            
+            // Se falhou todas as tentativas, usar URL original
+            tile.src = url;
+        }
+
+        function extractTileCoords(url) {
+            const match = url.match(/[xyz]=(\d+)/g);
+            if (!match || match.length < 3) return null;
+            
+            const coords = {};
+            match.forEach(param => {
+                const [key, value] = param.split('=');
+                coords[key] = parseInt(value);
+            });
+            
+            return coords.x !== undefined && coords.y !== undefined && coords.z !== undefined ? coords : null;
+        }
+
+        function isWithinCoverage(coords) {
+            // Converter tile para lat/lng
+            const tileBounds = tileToLatLng(coords.x, coords.y, coords.z);
+            const centerLat = (tileBounds.north + tileBounds.south) / 2;
+            const centerLng = (tileBounds.east + tileBounds.west) / 2;
+            
+            // Calcular distância do centro de Valparaíso
+            const distance = calculateDistance(
+                VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng,
+                centerLat, centerLng
+            );
+            
+            return distance <= COVERAGE_RADIUS_KM;
+        }
+
+        function tileToLatLng(x, y, z) {
+            const n = Math.pow(2, z);
+            const lonMin = (x / n) * 360 - 180;
+            const lonMax = ((x + 1) / n) * 360 - 180;
+            const latMaxRad = Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n)));
+            const latMinRad = Math.atan(Math.sinh(Math.PI * (1 - 2 * (y + 1) / n)));
+            
+            return {
+                north: latMaxRad * 180 / Math.PI,
+                south: latMinRad * 180 / Math.PI,
+                east: lonMax,
+                west: lonMin
+            };
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Raio da Terra em km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
         }
 
         async function getCachedTile(key) {
@@ -778,34 +966,35 @@
         async function saveTileToCache(key, data) {
             if (!offlineDB) return;
             
-            return new Promise((resolve) => {
+            try {
                 const transaction = offlineDB.transaction(['tiles'], 'readwrite');
                 const store = transaction.objectStore('tiles');
-                const request = store.put(data);
-                
-                request.onsuccess = () => resolve();
-                request.onerror = () => resolve();
-            });
+                await store.put(data);
+            } catch (error) {
+                console.log('Erro ao salvar tile:', error);
+            }
         }
 
-        function createEmptyTile() {
+        function createEmptyTile(message = 'Offline') {
             const canvas = document.createElement('canvas');
             canvas.width = 256;
             canvas.height = 256;
             const ctx = canvas.getContext('2d');
             
-            // Tile vazio com padrão
+            // Fundo escuro
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, 256, 256);
             
-            ctx.strokeStyle = '#334155';
+            // Borda
+            ctx.strokeStyle = '#374151';
             ctx.lineWidth = 1;
             ctx.strokeRect(0, 0, 256, 256);
             
-            ctx.fillStyle = '#64748b';
+            // Texto
+            ctx.fillStyle = '#6b7280';
             ctx.font = '12px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('Offline', 128, 128);
+            ctx.fillText(message, 128, 128);
             
             return canvas.toDataURL();
         }
@@ -818,95 +1007,163 @@
             });
         }
 
-        async function startDownload() {
+        function addCoverageCircle() {
+            // Adicionar círculo visual da área de cobertura
+            coverageCircle = L.circle([VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng], {
+                radius: COVERAGE_RADIUS_KM * 1000, // metros
+                color: '#8b5cf6',
+                fillColor: '#8b5cf6',
+                fillOpacity: 0.05,
+                weight: 2,
+                dashArray: '10, 10',
+                opacity: 0.6
+            }).addTo(map);
+
+            // Popup informativo
+            coverageCircle.bindPopup(`
+                <div style="color: #1e293b; font-family: Arial; font-size: 12px;">
+                    <h4 style="color: #8b5cf6; margin: 0 0 8px 0;">🌍 Área de Cobertura</h4>
+                    <p><strong>Centro:</strong> Valparaíso-SP</p>
+                    <p><strong>Raio:</strong> ${COVERAGE_RADIUS_KM} km</p>
+                    <p><strong>Área:</strong> ~${Math.round(Math.PI * COVERAGE_RADIUS_KM * COVERAGE_RADIUS_KM / 1000)} mil km²</p>
+                </div>
+            `);
+        }
+
+        async function downloadLayer(layerType) {
             if (downloadInProgress) return;
             
+            const button = document.getElementById(`${layerType}Btn`);
+            if (!button) return;
+            
             downloadInProgress = true;
-            const downloadBtn = document.getElementById('downloadBtn');
-            const progressContainer = document.getElementById('progressBarContainer');
+            button.disabled = true;
+            button.textContent = '⏳ Baixando...';
+            
+            await performDownload([layerType]);
+            
+            button.disabled = false;
+            button.textContent = layerType === 'satellite' ? '🛰️ Baixar Satélite' : '🌍 Baixar Híbrido';
+            downloadInProgress = false;
+        }
+
+        async function downloadAll() {
+            if (downloadInProgress) return;
+            
+            const button = document.getElementById('downloadAllBtn');
+            button.disabled = true;
+            button.textContent = '⚡ Baixando Todos...';
+            
+            downloadInProgress = true;
+            await performDownload(['satellite', 'hybrid']);
+            downloadInProgress = false;
+            
+            button.disabled = false;
+            button.textContent = '⚡ Baixar Todos';
+        }
+
+        async function performDownload(layers) {
+            const progressContainer = document.getElementById('progressContainer');
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             
-            downloadBtn.disabled = true;
-            downloadBtn.textContent = '⏳ Baixando...';
             progressContainer.style.display = 'block';
             
             const maxZoom = parseInt(document.getElementById('maxZoomSlider').value);
-            const layers = ['osm', 'satellite', 'hybrid'];
-            
             let totalTiles = 0;
             let downloadedTiles = 0;
             
-            // Calcular total de tiles
+            // Calcular total de tiles dentro da área de cobertura
             for (let layer of layers) {
-                for (let z = 6; z <= maxZoom; z++) {
-                    const bounds = getTileBounds(z);
-                    totalTiles += (bounds.maxX - bounds.minX + 1) * (bounds.maxY - bounds.minY + 1);
+                for (let z = 8; z <= maxZoom; z++) {
+                    const tilesInZoom = getTilesInCoverageArea(z);
+                    totalTiles += tilesInZoom.length;
                 }
             }
             
-            progressText.textContent = `0 de ${totalTiles} tiles baixados`;
+            progressText.textContent = `Preparando download de ${totalTiles} tiles...`;
             
             try {
                 for (let layer of layers) {
-                    for (let z = 6; z <= maxZoom; z++) {
-                        const bounds = getTileBounds(z);
-                        
-                        for (let x = bounds.minX; x <= bounds.maxX; x++) {
-                            for (let y = bounds.minY; y <= bounds.maxY; y++) {
-                                if (!downloadInProgress) break;
-                                
-                                await downloadTile(layer, z, x, y);
-                                downloadedTiles++;
-                                
-                                const progress = (downloadedTiles / totalTiles) * 100;
-                                progressFill.style.width = `${progress}%`;
-                                progressText.textContent = `${downloadedTiles} de ${totalTiles} tiles baixados (${progress.toFixed(1)}%)`;
-                                
-                                // Pequeno delay para não sobrecarregar o servidor
-                                if (downloadedTiles % 10 === 0) {
-                                    await new Promise(resolve => setTimeout(resolve, 100));
-                                }
-                                
-                                if (downloadedTiles % 50 === 0) {
-                                    updateStorageInfo();
-                                }
-                            }
-                            if (!downloadInProgress) break;
-                        }
+                    for (let z = 8; z <= maxZoom; z++) {
                         if (!downloadInProgress) break;
+                        
+                        const tiles = getTilesInCoverageArea(z);
+                        
+                        // Download em lotes para otimização
+                        const batchSize = 5;
+                        for (let i = 0; i < tiles.length; i += batchSize) {
+                            if (!downloadInProgress) break;
+                            
+                            const batch = tiles.slice(i, i + batchSize);
+                            const downloadPromises = batch.map(tile => 
+                                downloadSingleTile(layer, tile.z, tile.x, tile.y)
+                            );
+                            
+                            await Promise.allSettled(downloadPromises);
+                            downloadedTiles += batch.length;
+                            
+                            const progress = (downloadedTiles / totalTiles) * 100;
+                            progressFill.style.width = `${progress}%`;
+                            progressText.textContent = `${downloadedTiles}/${totalTiles} tiles (${progress.toFixed(1)}%) - ${layer}`;
+                            
+                            // Pausa para não sobrecarregar
+                            if (i % 20 === 0) {
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                                updateStorageInfo();
+                            }
+                        }
                     }
-                    if (!downloadInProgress) break;
                 }
                 
-                progressText.textContent = `Download concluído! ${downloadedTiles} tiles baixados`;
-                showSuccess('Download de mapas concluído!');
+                progressText.textContent = `✅ Download concluído! ${downloadedTiles} tiles baixados`;
+                showSuccess('Mapas offline prontos!');
+                
+                // Atualizar status
+                await checkOfflineDataStatus();
                 
             } catch (error) {
                 console.error('Erro no download:', error);
-                progressText.textContent = `Erro no download. ${downloadedTiles} tiles baixados.`;
+                progressText.textContent = `❌ Erro no download. ${downloadedTiles} tiles salvos.`;
             }
             
-            downloadInProgress = false;
-            downloadBtn.disabled = false;
-            downloadBtn.textContent = '🚀 Iniciar Download';
             updateStorageInfo();
         }
 
-        function getTileBounds(zoom) {
-            const minLat = saoPauloBounds.south;
-            const maxLat = saoPauloBounds.north;
-            const minLng = saoPauloBounds.west;
-            const maxLng = saoPauloBounds.east;
+        function getTilesInCoverageArea(zoom) {
+            const tiles = [];
+            const bounds = getCoverageTileBounds(zoom);
+            
+            for (let x = bounds.minX; x <= bounds.maxX; x++) {
+                for (let y = bounds.minY; y <= bounds.maxY; y++) {
+                    // Verificar se o tile está realmente dentro do círculo
+                    if (isWithinCoverage({x, y, z: zoom})) {
+                        tiles.push({x, y, z: zoom});
+                    }
+                }
+            }
+            
+            return tiles;
+        }
+
+        function getCoverageTileBounds(zoom) {
+            // Calcular bounds do quadrado que engloba o círculo
+            const kmPerDegree = 111.32; // km por grau aproximadamente
+            const degreesRadius = COVERAGE_RADIUS_KM / kmPerDegree;
+            
+            const minLat = VALPARAISO_CENTER.lat - degreesRadius;
+            const maxLat = VALPARAISO_CENTER.lat + degreesRadius;
+            const minLng = VALPARAISO_CENTER.lng - degreesRadius;
+            const maxLng = VALPARAISO_CENTER.lng + degreesRadius;
             
             const minTile = latLngToTile(maxLat, minLng, zoom);
             const maxTile = latLngToTile(minLat, maxLng, zoom);
             
             return {
-                minX: minTile.x,
-                minY: minTile.y,
-                maxX: maxTile.x,
-                maxY: maxTile.y
+                minX: Math.max(0, minTile.x),
+                minY: Math.max(0, minTile.y),
+                maxX: Math.min(Math.pow(2, zoom) - 1, maxTile.x),
+                maxY: Math.min(Math.pow(2, zoom) - 1, maxTile.y)
             };
         }
 
@@ -918,19 +1175,27 @@
             return { x, y };
         }
 
-        async function downloadTile(layer, z, x, y) {
+        async function downloadSingleTile(layer, z, x, y) {
             const tileKey = `${layer}_${z}_${x}_${y}`;
             
-            // Verificar se já existe no cache
+            // Verificar se já existe
             const existing = await getCachedTile(tileKey);
             if (existing) return;
             
             try {
                 const config = layerConfigs[layer];
-                let url = config.url.replace('{z}', z).replace('{x}', x).replace('{y}', y);
-                url = url.replace('{s}', ['a', 'b', 'c'][Math.floor(Math.random() * 3)]);
+                const subdomain = config.subdomains[Math.floor(Math.random() * config.subdomains.length)];
+                let url = config.url
+                    .replace('{z}', z)
+                    .replace('{x}', x)
+                    .replace('{y}', y)
+                    .replace('{s}', subdomain);
                 
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
                 if (response.ok) {
                     const blob = await response.blob();
                     const dataUrl = await blobToDataUrl(blob);
@@ -942,25 +1207,28 @@
                         x: x,
                         y: y,
                         blob: dataUrl,
+                        size: blob.size,
                         timestamp: Date.now()
                     });
                 }
             } catch (error) {
-                console.log(`Erro ao baixar tile ${tileKey}:`, error);
+                console.log(`Erro ao baixar tile ${tileKey}`);
             }
         }
 
         async function clearOfflineData() {
             if (!offlineDB || downloadInProgress) return;
             
-            if (confirm('Deseja realmente limpar todos os dados offline? Esta ação não pode ser desfeita.')) {
+            if (confirm('Limpar todos os mapas offline? Esta ação não pode ser desfeita.')) {
                 try {
                     const transaction = offlineDB.transaction(['tiles'], 'readwrite');
                     const store = transaction.objectStore('tiles');
                     await store.clear();
                     
+                    totalCachedTiles = 0;
                     updateStorageInfo();
-                    showSuccess('Cache offline limpo com sucesso!');
+                    await checkOfflineDataStatus();
+                    showSuccess('Cache limpo com sucesso!');
                 } catch (error) {
                     console.error('Erro ao limpar cache:', error);
                 }
@@ -974,18 +1242,35 @@
                 const transaction = offlineDB.transaction(['tiles'], 'readonly');
                 const store = transaction.objectStore('tiles');
                 
-                const countRequest = store.count();
-                countRequest.onsuccess = () => {
-                    const tileCount = countRequest.result;
-                    
-                    // Estimar tamanho (aproximadamente 15KB por tile)
-                    const estimatedSize = (tileCount * 15) / 1024; // MB
-                    
-                    document.getElementById('storageInfo').textContent = 
-                        `Cache: ${estimatedSize.toFixed(1)} MB | Tiles: ${tileCount}`;
+                // Contar tiles e estimar tamanho
+                let count = 0;
+                let totalSize = 0;
+                
+                const request = store.openCursor();
+                request.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        count++;
+                        totalSize += cursor.value.size || 15000; // 15KB estimado por tile
+                        cursor.continue();
+                    } else {
+                        const sizeMB = (totalSize / 1024 / 1024).toFixed(1);
+                        document.getElementById('storageInfo').textContent = 
+                            `Cache: ${sizeMB} MB | Tiles: ${count}`;
+                        totalCachedTiles = count;
+                    }
                 };
             } catch (error) {
-                console.error('Erro ao atualizar info de storage:', error);
+                console.error('Erro ao calcular storage:', error);
+            }
+        }
+
+        async function checkOfflineDataStatus() {
+            if (totalCachedTiles > 100) { // Se tem dados offline substanciais
+                document.getElementById('offlineStatus').textContent = '🗺️ Offline Ready';
+                document.getElementById('offlineStatus').className = 'offline-status offline-ready';
+            } else {
+                updateOfflineStatus();
             }
         }
 
@@ -993,9 +1278,10 @@
             const statusEl = document.getElementById('offlineStatus');
             if (navigator.onLine) {
                 statusEl.textContent = '📶 Online';
-                statusEl.style.color = '#10b981';
+                statusEl.className = 'offline-status';
             } else {
                 statusEl.textContent = '📴 Offline';
+                statusEl.className = 'offline-status';
                 statusEl.style.color = '#f59e0b';
             }
         }
@@ -1011,51 +1297,53 @@
                     const container = L.DomUtil.create('div', 'custom-control');
                     container.style.cssText = `
                         background: rgba(15, 23, 42, 0.9);
-                        padding: 6px;
-                        border-radius: 6px;
+                        padding: 5px;
+                        border-radius: 5px;
                         backdrop-filter: blur(10px);
                         border: 1px solid rgba(148, 163, 184, 0.2);
                         display: flex;
                         flex-direction: column;
-                        gap: 4px;
+                        gap: 3px;
                     `;
                     
-                    // Botão para centralizar na localização
+                    // Botão centralizar
                     const centerBtn = L.DomUtil.create('button', '', container);
                     centerBtn.innerHTML = '🎯';
                     centerBtn.style.cssText = `
-                        background: #3b82f6;
-                        border: none;
-                        color: white;
-                        padding: 6px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 12px;
+                        background: #3b82f6; border: none; color: white;
+                        padding: 5px; border-radius: 3px; cursor: pointer; font-size: 11px;
                     `;
-                    centerBtn.title = 'Centralizar na minha localização';
-                    centerBtn.onclick = function() {
+                    centerBtn.title = 'Centralizar na localização';
+                    centerBtn.onclick = () => {
                         if (currentPosition) {
                             map.setView([currentPosition.coords.latitude, currentPosition.coords.longitude], map.getZoom());
                         }
                     };
 
-                    // Botão para zoom na localização
+                    // Botão zoom
                     const zoomBtn = L.DomUtil.create('button', '', container);
                     zoomBtn.innerHTML = '🔍';
                     zoomBtn.style.cssText = `
-                        background: #10b981;
-                        border: none;
-                        color: white;
-                        padding: 6px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 12px;
+                        background: #10b981; border: none; color: white;
+                        padding: 5px; border-radius: 3px; cursor: pointer; font-size: 11px;
                     `;
-                    zoomBtn.title = 'Zoom máximo na localização';
-                    zoomBtn.onclick = function() {
+                    zoomBtn.title = 'Zoom na localização';
+                    zoomBtn.onclick = () => {
                         if (currentPosition) {
-                            map.setView([currentPosition.coords.latitude, currentPosition.coords.longitude], 18);
+                            map.setView([currentPosition.coords.latitude, currentPosition.coords.longitude], 16);
                         }
+                    };
+
+                    // Botão para Valparaíso
+                    const valparaisoBtn = L.DomUtil.create('button', '', container);
+                    valparaisoBtn.innerHTML = '🏠';
+                    valparaisoBtn.style.cssText = `
+                        background: #8b5cf6; border: none; color: white;
+                        padding: 5px; border-radius: 3px; cursor: pointer; font-size: 11px;
+                    `;
+                    valparaisoBtn.title = 'Ir para Valparaíso';
+                    valparaisoBtn.onclick = () => {
+                        map.setView([VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng], 12);
                     };
 
                     return container;
@@ -1067,27 +1355,27 @@
 
         function startLocationTracking() {
             if (!navigator.geolocation) {
-                showError('Geolocalização não suportada neste dispositivo');
+                showError('Geolocalização não suportada');
                 return;
             }
 
             const options = {
                 enableHighAccuracy: true,
                 timeout: 15000,
-                maximumAge: 1000
+                maximumAge: 2000
             };
 
             navigator.geolocation.getCurrentPosition(updatePosition, handleError, options);
             watchId = navigator.geolocation.watchPosition(updatePosition, handleError, options);
             
-            // Atualização periódica
+            // Atualização periódica mais frequente
             setInterval(() => {
                 navigator.geolocation.getCurrentPosition(
                     updatePosition,
-                    (error) => console.log('Atualização periódica falhou:', error.message),
+                    () => {},
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
-            }, 5000);
+            }, 3000);
         }
 
         function updatePosition(position) {
@@ -1104,7 +1392,7 @@
                 if (marker) map.removeLayer(marker);
                 if (accuracyCircle) map.removeLayer(accuracyCircle);
 
-                // Criar ícone personalizado
+                // Ícone do marcador baseado na precisão
                 let markerColor = '#ef4444';
                 if (accuracy <= 5) markerColor = '#10b981';
                 else if (accuracy <= 15) markerColor = '#f59e0b';
@@ -1113,16 +1401,13 @@
                     className: 'custom-marker',
                     html: `
                         <div style="
-                            width: 16px;
-                            height: 16px;
-                            background: ${markerColor};
-                            border: 2px solid white;
-                            border-radius: 50%;
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            width: 14px; height: 14px; background: ${markerColor};
+                            border: 2px solid white; border-radius: 50%;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                         "></div>
                     `,
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
                 });
 
                 marker = L.marker([lat, lon], { 
@@ -1137,66 +1422,66 @@
                         color: markerColor,
                         fillColor: markerColor,
                         fillOpacity: 0.1,
-                        weight: 1
+                        weight: 1,
+                        dashArray: accuracy > 20 ? '3, 3' : null
                     }).addTo(map);
                 }
 
-                // Popup com informações
-                const popupContent = `
-                    <div style="color: #1e293b; font-family: Arial, sans-serif; font-size: 12px;">
-                        <h4 style="margin: 0 0 8px 0; color: #3b82f6;">📍 Localização</h4>
+                // Calcular distância de Valparaíso
+                const distanceToValparaiso = calculateDistance(
+                    VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng, lat, lon
+                );
+
+                // Popup
+                marker.bindPopup(`
+                    <div style="color: #1e293b; font-family: Arial; font-size: 11px;">
+                        <h4 style="color: #3b82f6; margin: 0 0 6px 0;">📍 Localização Atual</h4>
                         <p><strong>Lat:</strong> ${lat.toFixed(6)}°</p>
                         <p><strong>Lng:</strong> ${lon.toFixed(6)}°</p>
-                        <p><strong>Precisão:</strong> ${accuracy?.toFixed(1) || 'N/A'}m</p>
+                        <p><strong>Precisão:</strong> ${accuracy?.toFixed(1)}m</p>
+                        <p><strong>Distância de Valparaíso:</strong> ${distanceToValparaiso.toFixed(1)}km</p>
                         <p><strong>Hora:</strong> ${new Date().toLocaleTimeString()}</p>
                     </div>
-                `;
-                marker.bindPopup(popupContent);
+                `);
+
+                // Atualizar distância na interface
+                document.getElementById('distance').textContent = `${distanceToValparaiso.toFixed(1)} km`;
             }
             
-            // Atualizar interface
+            // Atualizar coordenadas
             document.getElementById('latitude').textContent = lat.toFixed(6);
             document.getElementById('longitude').textContent = lon.toFixed(6);
             document.getElementById('accuracy').textContent = 
                 accuracy ? `${accuracy.toFixed(1)} m` : '-- m';
             
-            // Atualizar status
+            // Status GPS
             let statusText = 'GPS Ativo';
             let statusColor = '#10b981';
             
             if (accuracy <= 5) {
-                statusText = 'GPS - Precisão Excelente';
+                statusText = 'GPS Excelente';
             } else if (accuracy <= 15) {
-                statusText = 'GPS - Precisão Boa';
+                statusText = 'GPS Bom';
             } else if (accuracy <= 50) {
-                statusText = 'GPS - Precisão Moderada';
+                statusText = 'GPS Moderado';
                 statusColor = '#f59e0b';
-            } else if (accuracy > 50) {
-                statusText = 'GPS - Precisão Baixa';
+            } else {
+                statusText = 'GPS Baixo';
                 statusColor = '#ef4444';
             }
             
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = statusText;
-            statusEl.style.color = statusColor;
+            document.getElementById('status').textContent = statusText;
+            document.getElementById('status').style.color = statusColor;
         }
 
         function handleError(error) {
-            let message = 'Erro GPS: ';
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    message += 'Permissão negada';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    message += 'Posição indisponível';
-                    break;
-                case error.TIMEOUT:
-                    message += 'Timeout';
-                    break;
-                default:
-                    message += 'Erro desconhecido';
-            }
+            const messages = {
+                [error.PERMISSION_DENIED]: 'Permissão GPS negada',
+                [error.POSITION_UNAVAILABLE]: 'GPS indisponível',
+                [error.TIMEOUT]: 'Timeout GPS'
+            };
             
+            const message = messages[error.code] || 'Erro GPS';
             document.getElementById('status').textContent = message;
             document.getElementById('status').style.color = '#ef4444';
         }
@@ -1209,19 +1494,16 @@
         }
 
         function handleOrientation(event) {
-            let heading = event.alpha;
-            if (heading !== null) {
-                heading = 360 - heading;
-                currentHeading = heading;
-                
-                document.getElementById('compass').style.transform = `rotate(${heading}deg)`;
-                document.getElementById('heading').textContent = `${Math.round(heading)}°`;
+            if (event.alpha !== null) {
+                currentHeading = 360 - event.alpha;
+                document.getElementById('compass').style.transform = `rotate(${currentHeading}deg)`;
+                document.getElementById('heading').textContent = `${Math.round(currentHeading)}°`;
             }
         }
 
         async function shareLocation(type = 'complete') {
             if (!currentPosition) {
-                alert('Aguarde a obtenção da localização GPS');
+                alert('Aguarde a localização GPS');
                 return;
             }
 
@@ -1229,42 +1511,49 @@
             const lon = currentPosition.coords.longitude;
             const accuracy = currentPosition.coords.accuracy;
             
+            // Calcular distância de Valparaíso
+            const distance = calculateDistance(
+                VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng, lat, lon
+            );
+            
             let message;
             
             if (type === 'summary') {
-                message = `🌍 LOCALIZAÇÃO GPS - SÃO PAULO
+                message = `📍 LOCALIZAÇÃO GPS - Valparaíso SP
 				
-🗺️ Coordenadas: ${lat.toFixed(6)}, ${lon.toFixed(6)}
-🎯 Precisão: ${accuracy ? accuracy.toFixed(1) + 'm' : 'N/A'}
+🗺️ ${lat.toFixed(6)}, ${lon.toFixed(6)}
+🎯 Precisão: ${accuracy?.toFixed(1)}m
+📏 ${distance.toFixed(1)}km de Valparaíso
 
-📍 Google Maps: https://maps.google.com/?q=${lat},${lon}
+🔗 https://maps.google.com/?q=${lat},${lon}
 
-⚡ GPS Tracker Pakito SP - Modo Offline`;
+⚡ Pakito Tracker Valparaíso`;
             } else {
-                const timestamp = new Date().toLocaleString('pt-BR');
-                message = `🌍 DADOS COMPLETOS - LOCALIZAÇÃO SP
+                message = `🌍 LOCALIZAÇÃO COMPLETA - Região Valparaíso SP
             
-📍 Coordenadas:
-Latitude: ${lat.toFixed(6)}°
-Longitude: ${lon.toFixed(6)}°
+📍 Coordenadas GPS:
+• Latitude: ${lat.toFixed(6)}°
+• Longitude: ${lon.toFixed(6)}°
+• Precisão: ${accuracy?.toFixed(1)}m
 
-🎯 Precisão: ${accuracy ? accuracy.toFixed(1) + 'm' : 'N/A'}
-📅 Data/Hora: ${timestamp}
+📏 Referências:
+• Distância de Valparaíso: ${distance.toFixed(1)} km
+• Dentro da área de cobertura: ${distance <= COVERAGE_RADIUS_KM ? 'Sim' : 'Não'}
+
+🗺️ Links de Mapas:
+• Google Maps: https://maps.google.com/?q=${lat},${lon}
+• Apple Maps: https://maps.apple.com/?ll=${lat},${lon}
+• Waze: https://waze.com/ul?ll=${lat},${lon}
+
+⏰ Horário: ${new Date().toLocaleString('pt-BR')}
 🧭 Direção: ${Math.round(currentHeading)}°
 ${navigator.onLine ? '📶' : '📴'} Status: ${navigator.onLine ? 'Online' : 'Offline'}
 
-🗺️ Links de Mapas:
-Google Maps: https://maps.google.com/?q=${lat},${lon}
-Apple Maps: https://maps.apple.com/?ll=${lat},${lon}
-Waze: https://waze.com/ul?ll=${lat},${lon}
-
-📊 Coordenadas DMS: ${convertToDMS(lat, lon)}
-
-⚡ Gerado por GPS Tracker Pakito SP`;
+⚡ GPS Tracker Pakito - Valparaíso SP`;
             }
 
             try {
-                // Copiar para área de transferência
+                // Copiar para clipboard
                 if (navigator.clipboard) {
                     await navigator.clipboard.writeText(message);
                 } else {
@@ -1276,10 +1565,10 @@ Waze: https://waze.com/ul?ll=${lat},${lon}
                     document.body.removeChild(textArea);
                 }
 
-                // Tentar compartilhar nativamente
+                // Compartilhar nativamente se disponível
                 if (navigator.share) {
                     await navigator.share({
-                        title: 'Minha Localização GPS - São Paulo',
+                        title: 'Localização GPS - Valparaíso SP',
                         text: message
                     });
                 }
@@ -1292,29 +1581,14 @@ Waze: https://waze.com/ul?ll=${lat},${lon}
             }
         }
 
-        function convertToDMS(lat, lon) {
-            const latDMS = convertCoordToDMS(lat, lat >= 0 ? 'N' : 'S');
-            const lonDMS = convertCoordToDMS(lon, lon >= 0 ? 'E' : 'W');
-            return `${latDMS} ${lonDMS}`;
-        }
-
-        function convertCoordToDMS(coord, direction) {
-            const absolute = Math.abs(coord);
-            const degrees = Math.floor(absolute);
-            const minutesFloat = (absolute - degrees) * 60;
-            const minutes = Math.floor(minutesFloat);
-            const seconds = ((minutesFloat - minutes) * 60).toFixed(2);
-            return `${degrees}°${minutes}'${seconds}"${direction}`;
-        }
-
-        function showSuccess(message = 'Localização copiada e capturada!') {
+        function showSuccess(message = 'Localização copiada!') {
             const successMsg = document.getElementById('successMessage');
             successMsg.textContent = message;
             successMsg.classList.add('show');
             
             setTimeout(() => {
                 successMsg.classList.remove('show');
-            }, 3000);
+            }, 2500);
         }
 
         function showError(message) {
@@ -1325,71 +1599,30 @@ Waze: https://waze.com/ul?ll=${lat},${lon}
         function showLocationModal(message) {
             const modal = document.createElement('div');
             modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-                padding: 20px;
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 9999; padding: 15px;
             `;
             
-            const content = document.createElement('div');
-            content.style.cssText = `
-                background: #1e293b;
-                padding: 25px;
-                border-radius: 12px;
-                max-width: 90%;
-                max-height: 80%;
-                overflow-y: auto;
-                border: 1px solid rgba(148, 163, 184, 0.2);
-            `;
-            
-            content.innerHTML = `
-                <h3 style="color: white; margin-bottom: 15px; text-align: center;">📍 Localização GPS</h3>
-                <textarea readonly style="
-                    width: 100%;
-                    height: 250px;
-                    background: #0f172a;
-                    color: white;
-                    border: 1px solid rgba(148, 163, 184, 0.3);
-                    border-radius: 6px;
-                    padding: 12px;
-                    font-family: monospace;
-                    font-size: 11px;
-                    resize: none;
-                    margin-bottom: 15px;
-                ">${message}</textarea>
-                <div style="display: flex; gap: 8px; justify-content: center;">
-                    <button onclick="copyToClipboard('${message.replace(/'/g, "\\'")}'); this.textContent='Copiado!'" style="
-                        background: #3b82f6;
-                        color: white;
-                        border: none;
-                        padding: 10px 16px;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        font-size: 12px;
-                    ">Copiar</button>
-                    <button onclick="document.body.removeChild(this.closest('.modal-overlay'))" style="
-                        background: #6b7280;
-                        color: white;
-                        border: none;
-                        padding: 10px 16px;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        font-size: 12px;
-                    ">Fechar</button>
+            modal.innerHTML = `
+                <div style="background: #1e293b; padding: 20px; border-radius: 10px;
+                           max-width: 90%; max-height: 80%; overflow-y: auto;">
+                    <h3 style="color: white; margin-bottom: 12px; text-align: center;">📍 Localização</h3>
+                    <textarea readonly style="width: 100%; height: 200px; background: #0f172a;
+                                            color: white; border: 1px solid #374151; border-radius: 5px;
+                                            padding: 10px; font-family: monospace; font-size: 10px;
+                                            margin-bottom: 12px;">${message}</textarea>
+                    <div style="display: flex; gap: 8px; justify-content: center;">
+                        <button onclick="copyToClipboard('${message.replace(/'/g, "\\'")}'); this.textContent='✅ Copiado!'" 
+                                style="background: #3b82f6; color: white; border: none; padding: 8px 12px;
+                                       border-radius: 5px; cursor: pointer; font-size: 11px;">Copiar</button>
+                        <button onclick="document.body.removeChild(this.closest('div'))" 
+                                style="background: #6b7280; color: white; border: none; padding: 8px 12px;
+                                       border-radius: 5px; cursor: pointer; font-size: 11px;">Fechar</button>
+                    </div>
                 </div>
             `;
             
-            modal.className = 'modal-overlay';
-            modal.appendChild(content);
             document.body.appendChild(modal);
         }
 
@@ -1407,7 +1640,7 @@ Waze: https://waze.com/ul?ll=${lat},${lon}
             showSuccess('Texto copiado!');
         }
 
-        // Cleanup ao fechar
+        // Cleanup e wake lock
         window.addEventListener('beforeunload', function() {
             if (watchId) {
                 navigator.geolocation.clearWatch(watchId);
@@ -1421,13 +1654,201 @@ Waze: https://waze.com/ul?ll=${lat},${lon}
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Tela mantida ligada para GPS contínuo');
                 }
             } catch (err) {
                 console.log('Wake lock não suportado');
             }
         }
 
+        // Reativar wake lock quando a página fica visível
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        // Service Worker para funcionamento offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registrado:', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registro falhou:', registrationError);
+                    });
+            });
+        }
+
+        // Inicializar wake lock
         requestWakeLock();
+
+        // Preload de tiles importantes (centro de Valparaíso)
+        setTimeout(async () => {
+            if (navigator.onLine && totalCachedTiles === 0) {
+                // Download automático básico do centro de Valparaíso
+                const centerTiles = [
+                    { layer: 'satellite', z: 10, x: 592, y: 395 }, // Aproximadamente Valparaíso
+                    { layer: 'satellite', z: 11, x: 1184, y: 790 },
+                    { layer: 'satellite', z: 12, x: 2368, y: 1580 }
+                ];
+                
+                console.log('Fazendo preload de tiles centrais...');
+                for (const tile of centerTiles) {
+                    await downloadSingleTile(tile.layer, tile.z, tile.x, tile.y);
+                }
+                updateStorageInfo();
+            }
+        }, 3000);
+
+        // Detectar quando o dispositivo sai da área de cobertura
+        let outsideCoverageWarned = false;
+        function checkCoverageArea() {
+            if (!currentPosition) return;
+            
+            const distance = calculateDistance(
+                VALPARAISO_CENTER.lat, VALPARAISO_CENTER.lng,
+                currentPosition.coords.latitude, currentPosition.coords.longitude
+            );
+            
+            if (distance > COVERAGE_RADIUS_KM && !outsideCoverageWarned) {
+                showSuccess('⚠️ Fora da área de cobertura offline!');
+                outsideCoverageWarned = true;
+            } else if (distance <= COVERAGE_RADIUS_KM && outsideCoverageWarned) {
+                showSuccess('✅ De volta à área de cobertura!');
+                outsideCoverageWarned = false;
+            }
+        }
+
+        // Verificar área de cobertura a cada 10 segundos
+        setInterval(checkCoverageArea, 10000);
+
+        // Função para otimizar performance do mapa
+        function optimizeMapPerformance() {
+            if (map) {
+                // Reduzir tiles desnecessários quando offline
+                if (!navigator.onLine) {
+                    map.options.maxZoom = 16; // Limitar zoom quando offline
+                }
+                
+                // Limpar tiles antigos periodicamente
+                setTimeout(() => {
+                    if (map._layers) {
+                        Object.values(map._layers).forEach(layer => {
+                            if (layer._tiles) {
+                                const tileCount = Object.keys(layer._tiles).length;
+                                if (tileCount > 100) { // Se muitos tiles carregados
+                                    layer.redraw(); // Forçar limpeza
+                                }
+                            }
+                        });
+                    }
+                }, 30000); // A cada 30 segundos
+            }
+        }
+
+        // Executar otimização periodicamente
+        setInterval(optimizeMapPerformance, 60000); // A cada minuto
+
+        // Adicionar evento para mostrar info de debugging (opcional)
+        let debugMode = false;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'D' && e.ctrlKey && e.shiftKey) {
+                debugMode = !debugMode;
+                if (debugMode) {
+                    console.log('Debug mode ativado');
+                    console.log('Total cached tiles:', totalCachedTiles);
+                    console.log('Current position:', currentPosition);
+                    console.log('Coverage center:', VALPARAISO_CENTER);
+                    console.log('Coverage radius:', COVERAGE_RADIUS_KM);
+                } else {
+                    console.log('Debug mode desativado');
+                }
+            }
+        });
+
+        // Função para exportar dados offline (para debug)
+        window.exportOfflineData = async function() {
+            if (!offlineDB) return;
+            
+            const transaction = offlineDB.transaction(['tiles'], 'readonly');
+            const store = transaction.objectStore('tiles');
+            const allTiles = [];
+            
+            const request = store.openCursor();
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    allTiles.push({
+                        key: cursor.value.key,
+                        layer: cursor.value.layer,
+                        z: cursor.value.z,
+                        size: cursor.value.size || 0,
+                        timestamp: new Date(cursor.value.timestamp).toLocaleString()
+                    });
+                    cursor.continue();
+                } else {
+                    console.log('Tiles offline:', allTiles);
+                    console.log(`Total: ${allTiles.length} tiles`);
+                    
+                    // Agrupar por camada
+                    const byLayer = allTiles.reduce((acc, tile) => {
+                        acc[tile.layer] = (acc[tile.layer] || 0) + 1;
+                        return acc;
+                    }, {});
+                    console.log('Por camada:', byLayer);
+                }
+            };
+        };
+
+        // Adicionar indicador visual de status offline no mapa
+        function addOfflineIndicator() {
+            const indicator = L.control({position: 'bottomleft'});
+            
+            indicator.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'offline-indicator');
+                div.style.cssText = `
+                    background: rgba(15, 23, 42, 0.9);
+                    padding: 5px 8px;
+                    border-radius: 5px;
+                    font-size: 10px;
+                    color: #94a3b8;
+                    backdrop-filter: blur(5px);
+                    border: 1px solid rgba(148, 163, 184, 0.2);
+                `;
+                
+                function updateIndicator() {
+                    if (navigator.onLine) {
+                        div.innerHTML = totalCachedTiles > 0 ? 
+                            `📶 Online • ${totalCachedTiles} tiles` : 
+                            '📶 Online';
+                        div.style.color = '#10b981';
+                    } else {
+                        div.innerHTML = totalCachedTiles > 0 ? 
+                            `📴 Offline • ${totalCachedTiles} tiles` : 
+                            '📴 Offline • Sem cache';
+                        div.style.color = totalCachedTiles > 0 ? '#8b5cf6' : '#f59e0b';
+                    }
+                }
+                
+                updateIndicator();
+                
+                // Atualizar indicador quando status muda
+                window.addEventListener('online', updateIndicator);
+                window.addEventListener('offline', updateIndicator);
+                
+                // Atualizar quando tiles são baixados
+                setInterval(updateIndicator, 5000);
+                
+                return div;
+            };
+            
+            indicator.addTo(map);
+        }
+
+        // Adicionar indicador quando mapa estiver pronto
+        setTimeout(addOfflineIndicator, 2000);
     </script>
 </body>
 </html>
